@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="vue.js"></script>
+    <title>Title</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: none;
+        list-style: none;
+    }
+    body,html{
+        width: 100%;
+        height: 100%;
+        background: aliceblue;
+    }
+    #app{
+        width: 100%;
+        height: 100%;
+    }
+    header{
+        width: 100%;
+        height: 60px;
+        background: #333333;
+    }
+    header .pan{
+        width: 50%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        color: antiquewhite;
+        margin: 0 auto;
+    }
+    header .pan span{
+        width: 70px;
+        margin-right: 10px;
+    }
+    header .pan input[type=text]{
+        width: 400px;
+        height: 25px;
+        margin: 0;
+        padding: 0 5px;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+    header .pan select{
+        width: 80px;
+        height: 25px;
+        border-radius: 5px;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    section.con{
+        width: 100%;
+        height:calc(100vh - 100px) ;
+        position: relative;
+    }
+    section.con .list{
+        width: 300px;
+        height: 300px;
+        font-size: 20px;
+        font-family: '微软雅黑';
+        position: absolute;
+        border-radius: 5px;
+        overflow: hidden;
+        background: #fff;
+    }
+    section.con .list h1{
+        width: 100%;
+        height: 50px;
+        box-sizing: border-box;
+        padding: 13px 10px 0;
+    }
+    section.con .list h1 select{
+        width: 100px;
+        height: 24px;
+        float: right;
+        margin-right: 10px;
+        padding: 0;
+        border: none;
+        border-radius: 5px;
+    }
+    section.con .list div.text{
+        width: 100%;
+        height: 250px;
+    }
+    section.con .list div.text textarea{
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        color: #333333;
+        resize: none;
+    }
+    .active{
+        box-shadow: 0 0 30px rgba(0,0,0,0.7);
+        z-index: 100;
+    }
+    div.del{
+        width: 24px;
+        height: 24px;
+        font-size: 20px;
+        color: #333333;
+        float: right;
+        text-align: center;
+        line-height: 22px;
+        box-sizing: border-box;
+        border-radius: 3px;
+        box-shadow: 0 0 2px rgba(0,0,0,0.5) inset;
+        background: #EFEFEF;
+    }
+</style>
+<body>
+<div id="app">
+    <header>
+        <div class="pan">
+            <span>总数：{{notes.length}}</span>
+            <input type="text" placeholder="请输入要搜索的内容" v-model="change" @input="newnotes">
+            分类选择：
+            <select v-model="typearr" >
+                <option :value="types" >全部</option>
+                <option :value="tp" v-for="tp in types">{{tp}}</option>
+            </select>
+        </div>
+    </header>
+    <section class="con" @mousemove="move" @dblclick="db">
+        <div class="list" v-for="item in newnotes" :class="{active:activeid===item.id}" :style="{left:item.x+'px',top:item.y+'px'}" @mousedown="activeid=item.id">
+            <h1 :style="{background:item.color}" @mousedown="down" @mouseup="up">
+                <div class="del" @mousedown="del(item.id)">x</div>
+                <select v-model="item.type" @mousedown.stop>
+                    <option :value="typ" v-for="typ in types" >{{typ}}</option>
+                </select>
+            </h1>
+            <div class="text">
+                <textarea v-model="item.content"></textarea>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
+<script>
+    var app=new Vue({
+        el:'#app',
+        data:{
+            notes:[
+                {id:1,content:'asdad',x:100,y:100,color:'red',type:'娱乐'},
+                {id:2,content:'asdsadasd',x:200,y:200,color:'green',type:'学习'},
+                {id:3,content:'asd',x:300,y:300,color:'blue',type:'工作'},
+            ],
+            activeid:'',
+            notesnextid:4,
+            position:{
+                x:0,
+                y:0
+            },
+            f:false,
+            types:['娱乐','学习','工作'],
+            typearr:['娱乐','学习','工作'],
+            change:'',
+        },
+        methods:{
+            down(e){
+                this.f=true;
+                this.position.x= e.offsetX;
+                this.position.y= e.offsetY;
+            },
+            move(e){
+                var index=this.notes.findIndex(val=>val.id===this.activeid);
+                if(index==-1){
+                    return;
+                }
+                if(this.f){
+                    this.notes[index].x= e.clientX-this.position.x;
+                    this.notes[index].y= e.clientY-this.position.y-60;
+                }
+            },
+            up(){
+                this.f=false;
+            },
+            del(id){
+                var index=this.notes.findIndex(val=>val.id===id);
+                this.notes.splice(index,1);
+            },
+            db(e){
+                var r=Math.round(Math.random()*255);
+                var g=Math.round(Math.random()*255);
+                var b=Math.round(Math.random()*255);
+                this.notes.push({id:this.notesnextid,content:'',x: e.clientX,y: e.clientY-60,color:`rgb(${r},${g},${b})`,type:this.typearr instanceof Array? this.typearr[0]:this.typearr});
+                this.activeid=this.notesnextid;
+                this.notesnextid++;
+            },
+
+        },
+        computed:{
+            newnotes(){
+                var newnotes;
+                newnotes=this.notes.filter(val=>val.content.includes(this.change));
+                newnotes=newnotes.filter(val=>this.typearr.includes(val.type));
+                return newnotes;
+            }
+        },
+        beforeMount(){
+            if(localStorage.notes){
+                this.notes=JSON.parse(localStorage.notes);
+                this.notesnextid=JSON.parse(localStorage.notesnextid);
+            }
+        },
+        updated(){
+            localStorage.notes=JSON.stringify(this.notes);
+            localStorage.notesnextid=JSON.stringify(this.notesnextid);
+        }
+    })
+</script>

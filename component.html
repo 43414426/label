@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="vue.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <myapp></myapp>
+    <myapp></myapp>
+    <myapp></myapp>
+
+</div>
+
+<div id="app1">
+    <newapp></newapp>
+    <newapp></newapp>
+    <newapp></newapp>
+    <table>
+        <tr is="aaaa" @shi="shido"></tr>
+        <tr is="aaaa"></tr>
+        <!--<tr is="aaaa" :val="val">{{val}}</tr>-->
+        <tr is="aaaa">
+            asdf
+        </tr>
+        <aaaa :val="val"></aaaa>
+        <aaaa>sdf</aaaa>
+        <aaaa :val="val">{{val}}</aaaa>
+
+    </table>
+    <aaaa></aaaa>
+</div>
+</body>
+</html>
+<script>
+    Vue.component('myapp',{
+        template:`<h1 @click="fun">爱上淡淡的{{aa}}</h1>`,
+        data(){
+            return {
+                aa:1,
+            }
+        },
+        methods:{
+            fun(){
+                this.aa++;
+            }
+        }
+    })
+    var app=new Vue({
+        el:'#app',
+        data:{
+
+        }
+    })
+    var app1=new Vue({
+        el:'#app1',
+        data:{
+            val:123,
+        },
+        components:{
+            'newapp':{
+                template:`<h3>束带结发看过你的那份</h3>`
+            },
+            'aaaa':{
+                template:`
+                    <tr @click="fun">{{aa}}{{val}}</tr>
+                `,
+                props:[ 'val'],
+                data(){
+                   return{
+                       aa:1,
+                   }
+                },
+                methods:{
+                    fun(){
+                        this.$emit('shi','我想···');
+                        this.aa++;
+                    }
+                }
+            }
+        },
+        methods:{
+            shido(a){
+                alert(a);
+            }
+        }
+    })
+</script>
